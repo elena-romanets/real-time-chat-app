@@ -7,7 +7,18 @@ export const initializeSocket = (): Socket => {
   const token = getStoredToken();
   
   const socket = io(SERVER_URL, {
-    auth: token ? { token } : undefined
+    auth: token ? { token } : undefined,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    timeout: 10000,
+    reconnection: true
+  });
+  
+  socket.on('reconnect', () => {
+    console.log('Socket reconnected, requesting rooms');
+    setTimeout(() => {
+      socket.emit('get_rooms');
+    }, 300);
   });
   
   return socket;

@@ -15,19 +15,35 @@ export const setupSocketEvents = (
     setRooms(roomsList);
   });
 
+  socket.on('connect', () => {
+    console.log('Socket connected, requesting rooms');
+    socket.emit('get_rooms');
+  });
+
+  socket.on('auth_success', () => {
+    console.log('Authentication successful, requesting rooms');
+    socket.emit('get_rooms');
+  });
+
   socket.on('room_joined', ({ room, messages: roomMessages }) => {
     console.log('Joined room:', room);
     setCurrentRoom(room);
     setMessages(roomMessages);
+    
+    socket.emit('get_rooms');
   });
 
   socket.on('room_created', ({ roomId }) => {
     console.log('Room created successfully:', roomId);
+    
+    socket.emit('get_rooms');
+    
     joinRoom(roomId);
   });
 
   socket.on('room_exists', ({ roomId }) => {
     console.log('Room already exists:', roomId);
+    socket.emit('get_rooms');
   });
 
   socket.on('receive_message', (message: Message) => {
@@ -42,6 +58,8 @@ export const setupSocketEvents = (
         users: [...prevRoom.users, user]
       };
     });
+    
+    socket.emit('get_rooms');
   });
 
   socket.on('user_left', ({ userId }: { userId: string }) => {
@@ -52,10 +70,14 @@ export const setupSocketEvents = (
         users: prevRoom.users.filter(user => user.id !== userId)
       };
     });
+    
+    socket.emit('get_rooms');
   });
 };
 
 export const cleanupSocketEvents = (socket: Socket) => {
+  socket.off('connect');
+  socket.off('auth_success');
   socket.off('room_list');
   socket.off('room_joined');
   socket.off('room_created');

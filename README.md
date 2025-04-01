@@ -61,3 +61,7 @@ npm run dev
 6. Leave a room by clicking the "Leave Room" button.
 7. Log out using the "Log Out" button in the room header.
 
+## Video link for app behavior
+
+https://drive.google.com/file/d/1a7QvIehfzDOydRN0EaynPDVj4a1Xov2d/view?usp=sharing
+

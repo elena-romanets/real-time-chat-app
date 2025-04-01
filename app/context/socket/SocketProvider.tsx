@@ -54,6 +54,11 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     newSocket.on("connect", () => {
       setIsConnected(true);
       console.log("Connected to server");
+      
+      if (isAuthenticated) {
+        console.log("Already authenticated on connect, requesting rooms");
+        newSocket.emit("get_rooms");
+      }
     });
 
     newSocket.on("disconnect", () => {
@@ -71,8 +76,6 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
       setAuthError(error.message || "Authentication failed");
       setIsAuthenticated(false);
     });
-
-    newSocket.emit("get_rooms");
 
     return () => {
       disconnectSocket(newSocket);
@@ -116,6 +119,12 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
 
       if (socket) {
         socket.disconnect().connect();
+        
+        // Give the socket a moment to reconnect before requesting rooms
+        setTimeout(() => {
+          console.log('Requesting rooms after login');
+          socket.emit('get_rooms');
+        }, 500);
       }
 
       return true;
@@ -124,6 +133,13 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
       return false;
     }
   };
+
+  useEffect(() => {
+    if (isAuthenticated && socket) {
+      console.log('Authentication state changed to true, requesting rooms');
+      socket.emit('get_rooms');
+    }
+  }, [isAuthenticated, socket]);
 
   const logout = () => {
     if (currentRoom) {

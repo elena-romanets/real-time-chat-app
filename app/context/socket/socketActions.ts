@@ -22,9 +22,10 @@ export const leaveRoom = (
   socket: Socket | null,
   currentRoom: Room | null
 ) => {
-  if (!socket || !currentRoom) return;
+  if (!socket || !currentRoom) return false;
   
   socket.emit('leave_room', { roomId: currentRoom.id });
+  console.log('Leaving room:', currentRoom.id);
   return true;
 };
 
@@ -39,6 +40,11 @@ export const createRoom = (
   
   console.log('Attempting to create room:', roomName);
   socket.emit('create_room', { roomName });
+  
+  setTimeout(() => {
+    socket.emit('get_rooms');
+  }, 300);
+
   return true;
 };
 

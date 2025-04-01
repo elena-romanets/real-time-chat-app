@@ -96,28 +96,72 @@ io.on('connection', (socket) => {
 
   // Join a room
   socket.on('join_room', ({ username, roomId }) => {
-    // Create a new user
-    const user: User = {
-      id: socket.id,
-      username,
-      roomId
-    };
-
-    // Add user to users list
-    users[socket.id] = user;
-
-    // Create room if it doesn't exist
-    if (!rooms[roomId]) {
-      rooms[roomId] = {
-        id: roomId,
-        name: roomId,
-        messages: [],
-        users: []
+    console.log(`User ${socket.id} (${username}) is joining room ${roomId}`);
+    
+    // Check if user is already in another room
+    const existingUser = users[socket.id];
+    if (existingUser) {
+      console.log(`User ${username} (${socket.id}) is already in room ${existingUser.roomId}`);
+      
+      // If user is already in this room, do nothing
+      if (existingUser.roomId === roomId) {
+        console.log(`User ${username} is already in room ${roomId}, doing nothing`);
+        return;
+      }
+      
+      // If user is in a different room, remove them from that room first
+      if (existingUser.roomId && rooms[existingUser.roomId]) {
+        console.log(`Removing user ${username} from previous room ${existingUser.roomId}`);
+        
+        // Remove user from previous room
+        rooms[existingUser.roomId].users = rooms[existingUser.roomId].users.filter(u => u.id !== socket.id);
+        
+        // Leave previous socket room
+        socket.leave(existingUser.roomId);
+        
+        // Broadcast to previous room that user left
+        socket.to(existingUser.roomId).emit('user_left', { userId: socket.id });
+      }
+      
+      // Update user's room
+      existingUser.roomId = roomId;
+      
+      // Create room if it doesn't exist
+      if (!rooms[roomId]) {
+        rooms[roomId] = {
+          id: roomId,
+          name: roomId,
+          messages: [],
+          users: []
+        };
+      }
+      
+      // Add user to new room
+      rooms[roomId].users.push(existingUser);
+    } else {
+      // Create a new user
+      const user: User = {
+        id: socket.id,
+        username,
+        roomId
       };
-    }
 
-    // Add user to room
-    rooms[roomId].users.push(user);
+      // Add user to users list
+      users[socket.id] = user;
+
+      // Create room if it doesn't exist
+      if (!rooms[roomId]) {
+        rooms[roomId] = {
+          id: roomId,
+          name: roomId,
+          messages: [],
+          users: []
+        };
+      }
+
+      // Add user to room
+      rooms[roomId].users.push(user);
+    }
 
     // Join socket room
     socket.join(roomId);
@@ -134,7 +178,7 @@ io.on('connection', (socket) => {
 
     // Broadcast to room that user joined
     socket.to(roomId).emit('user_joined', { 
-      user: { id: user.id, username: user.username } 
+      user: { id: socket.id, username: users[socket.id].username } 
     });
 
     // Update room list for everyone
@@ -217,16 +261,42 @@ io.on('connection', (socket) => {
   socket.on('leave_room', ({ roomId }) => {
     const user = users[socket.id];
     
-    if (!user || !rooms[roomId]) return;
+    console.log(`User ${socket.id} is trying to leave room ${roomId}`);
+    
+    if (!user) {
+      console.log(`User ${socket.id} not found`);
+      return;
+    }
+    
+    if (!rooms[roomId]) {
+      console.log(`Room ${roomId} not found`);
+      return;
+    }
+    
+    console.log(`Before: User ${user.username} (${socket.id}) is in room ${user.roomId}`);
+    
+    // Check if user is actually in this room
+    if (user.roomId !== roomId) {
+      console.log(`User is not in room ${roomId}, they are in ${user.roomId}`);
+      return;
+    }
 
     // Remove user from room
     rooms[roomId].users = rooms[roomId].users.filter(u => u.id !== socket.id);
+    
+    // Update user's room to null or empty string
+    user.roomId = "";
 
     // Leave socket room
     socket.leave(roomId);
 
+    // Emit to the client that they've left
+    socket.emit('room_left');
+
     // Broadcast to room that user left
     socket.to(roomId).emit('user_left', { userId: socket.id });
+
+    console.log(`After: User ${user.username} (${socket.id}) has left room ${roomId}`);
 
     // Update room list for everyone
     io.emit('room_list', Object.values(rooms).map(room => ({
@@ -234,9 +304,6 @@ io.on('connection', (socket) => {
       name: room.name,
       userCount: room.users.length
     })));
-
-    // No longer removing empty rooms - all rooms persist
-    // Rooms will stay available even when empty
   });
 
   // Disconnect
@@ -244,14 +311,18 @@ io.on('connection', (socket) => {
     const user = users[socket.id];
     
     if (user) {
+      console.log(`User ${user.username} (${socket.id}) disconnected from room ${user.roomId}`);
+      
       const roomId = user.roomId;
       
-      if (rooms[roomId]) {
+      if (roomId && rooms[roomId]) {
         // Remove user from room
         rooms[roomId].users = rooms[roomId].users.filter(u => u.id !== socket.id);
 
         // Broadcast to room that user left
         socket.to(roomId).emit('user_left', { userId: socket.id });
+        
+        console.log(`User ${user.username} removed from room ${roomId}. Room now has ${rooms[roomId].users.length} users.`);
 
         // Update room list for everyone
         io.emit('room_list', Object.values(rooms).map(room => ({
@@ -259,9 +330,6 @@ io.on('connection', (socket) => {
           name: room.name,
           userCount: room.users.length
         })));
-
-        // No longer removing empty rooms - all rooms persist
-        // Rooms will stay available even when empty
       }
 
       // Remove user from users list

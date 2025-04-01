@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Real-Time Chat Application
+
+A real-time chat application that allows multiple users to join and interact in different chat rooms. This project demonstrates real-time communication, token-based authentication, and a modular, scalable architecture.
+
+## Features
+
+- Real-time messaging using Socket.IO
+- Token-based authentication
+- Multiple chat rooms with real-time updates
+- Room creation and management
+- Display of active rooms and online users
+- Secure user sessions with token persistence
+- Modular, component-based architecture
+
+## Tech Stack
+
+- **Frontend**: React (Next.js), TypeScript, TailwindCSS
+- **Backend**: Node.js, Express, Socket.IO
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v18+ recommended)
+- npm
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Running the Application
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application consists of both a frontend (Next.js) and a backend (Express) server. You can run them both simultaneously using:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev:all
+```
 
-## Learn More
+Or you can run them separately:
 
-To learn more about Next.js, take a look at the following resources:
+backend server:
+```bash
+npm run dev:server
+```
+frontend development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## How to Use
 
-## Deploy on Vercel
+1. Enter a username and password on the login screen to authenticate.
+2. After login, you'll see the available chat rooms.
+3. Join any room by clicking on it.
+4. Create a new room using the "Create New Room" button.
+5. Send messages in the current room using the message input at the bottom.
+6. Leave a room by clicking the "Leave Room" button.
+7. Log out using the "Log Out" button in the room header.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

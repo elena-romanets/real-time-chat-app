@@ -65,3 +65,6 @@ npm run dev
 
 https://drive.google.com/file/d/1a7QvIehfzDOydRN0EaynPDVj4a1Xov2d/view?usp=sharing
 
+## Video link for README 
+https://drive.google.com/file/d/1h3f8YmSXJGSRVDl6ML1NtRSX_rLHrlVL/view?usp=sharing
+

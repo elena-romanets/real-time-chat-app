@@ -1,14 +1,11 @@
 'use client';
 
+import { useSocket } from '@/app/context/SocketContext';
 import { useState } from 'react';
 
-interface CreateRoomFormProps {
-  onCreateRoom: (roomName: string) => void;
-  isConnected: boolean;
-  username: string;
-}
+export default function CreateRoomForm(){
+  const { createRoom, username, isConnected }= useSocket();
 
-export default function CreateRoomForm({ onCreateRoom, isConnected, username }: CreateRoomFormProps) {
   const [newRoomName, setNewRoomName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
 
@@ -22,7 +19,7 @@ export default function CreateRoomForm({ onCreateRoom, isConnected, username }: 
       return;
     }
     
-    onCreateRoom(newRoomName);
+    createRoom(newRoomName);
     setNewRoomName('');
     setIsCreating(false);
   };

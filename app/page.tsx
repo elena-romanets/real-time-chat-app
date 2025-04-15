@@ -1,12 +1,12 @@
 'use client';
 
 import { SocketProvider } from './context/SocketContext';
-import Chat from './components/Chat';
+import App from './components/App';
 
 export default function Home() {
   return (
     <SocketProvider>
-      <Chat />
+      <App />
     </SocketProvider>
   );
 }

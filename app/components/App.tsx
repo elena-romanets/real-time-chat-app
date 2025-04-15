@@ -2,10 +2,10 @@
 
 import { useSocket } from '../context/SocketContext';
 import LoginScreen from './LoginScreen';
-import RoomList from './RoomList';
+import Sidebar from './Sidebar';
 import ChatRoom from './ChatRoom';
 
-export default function Chat() {
+export default function App() {
   const { username, currentRoom } = useSocket();
 
   if (!username) {
@@ -14,7 +14,7 @@ export default function Chat() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <RoomList />
+      <Sidebar />
       <div className="flex-1 flex flex-col">
         {currentRoom ? (
           <ChatRoom />

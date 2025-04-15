@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSocket } from "../context/SocketContext";
 
 export default function LoginScreen() {
-  const { login, isAuthenticated, authError } = useSocket();
+  const { login, authError } = useSocket();
   const [inputUsername, setInputUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");

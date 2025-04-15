@@ -2,23 +2,16 @@
 
 import { useSocket } from "../../context/SocketContext";
 
-interface RoomHeaderProps {
-  roomCount: number;
-}
-
-export default function RoomHeader({ roomCount }: RoomHeaderProps) {
-  const { logout, username } = useSocket();
-
-  const handleLogout = () => {
-    logout();
-  };
+export default function RoomHeader() {
+  const { logout, username, rooms } = useSocket();
+  const roomCount = rooms.length;
 
   return (
     <div className="p-4 border-b border-gray-200 flex-col justify-between items-center">
       <div className="flex-col">
         <div className="font-medium">{username}</div>
         <button
-          onClick={handleLogout}
+          onClick={logout}
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm mt-2"
         >
           Log Out

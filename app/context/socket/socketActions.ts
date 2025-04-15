@@ -40,10 +40,6 @@ export const createRoom = (
   
   console.log('Attempting to create room:', roomName);
   socket.emit('create_room', { roomName });
-  
-  setTimeout(() => {
-    socket.emit('get_rooms');
-  }, 300);
 
   return true;
 };

@@ -1,21 +1,20 @@
 'use client';
 
+import { useSocket } from '@/app/context/SocketContext';
 import { RoomListItem as RoomItem } from '../../types';
-import { Room } from '../../types';
 
 interface RoomListItemProps {
   room: RoomItem;
-  currentRoom: Room | null;
-  onJoinRoom: (roomId: string) => void;
 }
 
-export default function RoomListItem({ room, currentRoom, onJoinRoom }: RoomListItemProps) {
+export default function RoomListItem({ room }: RoomListItemProps) {
+  const { currentRoom, joinRoom } = useSocket();
   const isActive = currentRoom?.id === room.id;
   
   return (
     <li>
       <button
-        onClick={() => onJoinRoom(room.id)}
+        onClick={() => joinRoom(room.id)}
         className={`w-full px-4 py-3 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-100 ${
           isActive ? 'bg-indigo-50' : ''
         }`}
